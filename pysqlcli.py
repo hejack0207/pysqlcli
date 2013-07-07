@@ -223,6 +223,24 @@ class Processor(object):
         ]
 
 
+    def get_commands(self):
+        '''Returns a dict with internal commands
+
+        The estructure is a dict, where each element has a field indicating if
+        the commands receives parameters'''
+
+        comms = dict()
+        for elem in self._commands:
+            if elem[0]:
+                if elem[0] == '\\d':
+                    comms['\\d'] = 'table'
+                elif elem[0] == '\\c':
+                    comms['\\c'] = 'filename'
+                else:
+                    comms[elem[0]] = None
+        return comms
+
+
     def _print_help(self):
         '''Prints commands help'''
         for line in self._commands:
@@ -313,6 +331,84 @@ class Processor(object):
             self._printer.deactivate_csv()
 
 
+class DBcompleter(object):
+    '''Class for the autocompletion'''
+
+    def __init__(self, database, commands_dict):
+        '''Constructor'''
+
+        self._database = database
+        self._commands_dict = commands_dict
+        self._commands = [key for key in self._commands_dict]
+        self._sql_opers = ('SELECT',)
+
+
+    def _complete_command_args(self, command, text, state):
+        '''Given a command returns the valid command args'''
+
+        option = self._commands_dict.get(command, None)
+        if not option:
+            # Nothing to complete
+            return list()
+        if option == 'table':
+            # Autocomplete table
+            if state == 0:
+                # cache tables
+                rset = self._database.run_list_tables()
+                self._tables = [row[0] for row in rset]
+            return [table + ' ' for table in self._tables if
+            table.startswith(text.upper())]
+        # It has an option, but I don't know how to autocomplete it
+        return list()
+
+
+    def _complete_command(self, text, state):
+        '''Give the command autocompletion alternatives'''
+
+        buff = readline.get_line_buffer().lstrip()
+        tokens = buff.split()
+        if len(tokens) == 1:
+            if tokens[0] == '\\':
+                # Handle this special case that confuses readline
+                # Return the commands without the blackslash
+                return [elem[1:] + ' ' for elem in self._commands]
+            if tokens[0][1:] == text:
+                # Check if we can continue autocompleting
+                # Remember that readline swallow the \
+                return [elem[1:] + ' ' for elem in self._commands if
+                elem.startswith(tokens[0])]
+            return self._complete_command_args(tokens[0], text, state)
+        if (len(tokens) == 2 and not text) or len(tokens) > 2:
+            # Don't complete options with more than 2 args
+            # or that have two tokens and the text is empty
+            return list()
+        return self._complete_command_args(tokens[0], text, state)
+
+
+    def _sql_complete(self, text, state):
+        '''Give the sql autocompletion alternatives'''
+        return list()
+
+
+    def complete(self, text, state):
+        '''The autocompletion function that calls readline'''
+
+        buff = readline.get_line_buffer().lstrip()
+        if not buff:
+            # empty, give all the options
+            options = [comm + ' ' for comm in self._commands]
+            options.extend([oper + ' ' for oper in self._sql_opers])
+        else:
+            if buff.startswith('\\'):
+                # Command
+                options = self._complete_command(text, state)
+            else:
+                # SQL
+                options = self._sql_complete(text, state)
+        options.append(None)
+        return options[state]
+
+
 def print_usage():
     '''Prints command usage. =( I can't use argparse'''
 
@@ -356,6 +452,8 @@ def _main():
     # register the function to save the history at exit. THX python examples
     atexit.register(readline.write_history_file, histfile)
     processor = Processor(database)
+    db_completer = DBcompleter(database, processor.get_commands())
+    readline.set_completer(db_completer.complete)
     io_loop(processor)
     database.close()
 

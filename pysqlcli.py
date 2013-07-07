@@ -14,18 +14,35 @@ import atexit
 def _print_to_stderr(data):
     '''Prints data to stderr'''
 
+    # Yes, I know there is a shortcut but I don't like the C++ like syntax XD
+
     stdout = sys.stdout
     sys.stdout = sys.stderr
-
     print(data)
-
     sys.stdout = stdout
 
 
 def usage():
     '''Prints command usage. =( I can't use argparse'''
 
+    # I miss argparse
     _print_to_stderr('Usage: %s <oracle connection string (DSN)>' % sys.argv[0])
+
+
+def build_string(start_token, sep_token, end_token, *strings):
+    '''Returns a string starting with start_token followed by string separator
+    and finalized by end_token'''
+
+    n_strings = len(strings)
+    val = start_token
+    for idx, elem in enumerate(strings):
+        val += elem
+        # is this the last element?
+        if idx + 1 == n_strings:
+            val += end_token
+        else:
+            val += sep_token
+    return val
 
 
 def print_help():
@@ -35,7 +52,7 @@ def print_help():
         'Prints this help:  \\h\n'
         'Lists all tables:  \\d\n'
         'Describes a table: \\d <table>\n'
-        'Exits:             \\q\n',
+        'Exits:             \\q\n'
         'Executes SQL:      <sql command>')
 
     _print_to_stderr(message)

@@ -35,6 +35,7 @@ def print_help():
         'Prints this help:  \\h\n'
         'Lists all tables:  \\d\n'
         'Describes a table: \\d <table>\n'
+        'Exits:             \\q\n',
         'Executes SQL:      <sql command>')
 
     _print_to_stderr(message)
@@ -68,6 +69,9 @@ def process_line(cursor, user, readed_line):
                 rset = run_list_tables(cursor)
             elif len(command) == 2:
                 rset = run_describe(cursor, user, command[1])
+        elif command[0] == '\\q':
+            # A cheap trick to exit
+            raise EOFError
         else:
             _print_to_stderr("Unknown command, use \\h for help")
             return

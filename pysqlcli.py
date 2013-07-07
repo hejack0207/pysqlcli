@@ -28,14 +28,65 @@ def usage():
     _print_to_stderr('Usage: %s <oracle connection string (DSN)>' % sys.argv[0])
 
 
-def io_loop(cursor):
+def print_help():
+    '''Print internal system help'''
+
+    message = ('Usage:\n'
+        'Prints this help:  \\h\n'
+        'Lists all tables:  \\d\n'
+        'Describes a table: \\d <table>\n'
+        'Executes SQL:      <sql command>')
+
+    _print_to_stderr(message)
+
+
+def process_line(cursor, user, readed_line):
+    '''Process the line accordingly'''
+
+    num_args_err = "Invalid number of arguments, use \\h for help"
+
+    line = readed_line.strip()
+
+    if not line:
+        # Empty line
+        return
+
+    if line.startswith('\\'):
+        # its a command
+        command = line.split()
+        if command[0] == '\\h':
+            if len(command) != 1:
+                _print_to_stderr(num_args_err)
+                return
+            print_help()
+            return
+        elif command[0] == '\\d':
+            if len(command) > 2:
+                _print_to_stderr(num_args_err)
+                return
+            if len(command) == 1:
+                rset = run_list_tables(cursor)
+            elif len(command) == 2:
+                rset = run_describe(cursor, user, command[1])
+        else:
+            _print_to_stderr("Unknown command, use \\h for help")
+            return
+    else:
+        # SQL
+        rset = execute_query(cursor, line)
+
+    if rset:
+        print_result_set(rset)
+
+
+def io_loop(cursor, user):
     '''Prompt reading loop'''
 
     prompt = 'pysqlcli> '
     while True:
         try:
             line = raw_input(prompt)
-            execute_query(cursor, line)
+            process_line(cursor, user, line)
         except(EOFError, KeyboardInterrupt):
             # Old schoold exception handling, dated python =(
             # cosmetic ending
@@ -44,15 +95,18 @@ def io_loop(cursor):
 
 
 def execute_query(cursor, query):
-    '''Executes the given query'''
+    '''Executes the given query and returns the result set, None if error'''
 
     try:
         rset = cursor.execute(query)
-        print_result_set(rset)
+        return rset
     except cx_Oracle.DatabaseError, exc:
         error, = exc.args
         _print_to_stderr("Oracle-Error-Code: %s" % error.code)
         _print_to_stderr("Oracle-Error-Message: %s" % error.message)
+
+    # reached after an exception. TODO: excess of C style
+    return None
 
 
 def print_result_set(rset):
@@ -62,8 +116,9 @@ def print_result_set(rset):
     max_lengths = list()
     headers = list()
     rows = list()
+    null = 'NULL'
 
-    # TODO: needs some improvement, read about print and stuff
+    # TODO: needs some improvement, I must read about print and stuff
 
     # Get the max length of each field and initialize the headers and rows lst
     for f in rset.description:
@@ -73,8 +128,13 @@ def print_result_set(rset):
     for row in rset:
         rows.append(row)
         for i, e in enumerate(row):
-            if e is not None and len(e) > max_lengths[i]:
-                max_lengths[i] = len(e)
+            if e is None:
+                if len(null) > max_lengths[i]:
+                    max_lengths[i] = len(null)
+            else:
+                e = str(e)
+                if len(e) > max_lengths[i]:
+                    max_lengths[i] = len(e)
 
     # print header
     for i, h in enumerate(headers):
@@ -96,6 +156,9 @@ def print_result_set(rset):
     # print fields
     for row in rows:
         for i, e in enumerate(row):
+            if e is None:
+                e = null
+            e = str(e)
             sc = ''
             # First field doesn't starts with a |
             if i != 0:
@@ -107,6 +170,44 @@ def print_result_set(rset):
     print '(%d rows)' % rset.rowcount
 
 
+def run_describe(cursor, user, table):
+    """Run the describe query given an user and table returning a result set"""
+
+    # The ugly query to emulate DESCRIBE of sql*plus Thx CERN
+    describe = ("SELECT atc.column_name, "
+        "CASE atc.nullable WHEN 'Y' THEN 'NULL' ELSE 'NOT NULL' END \"Null?\","
+        "atc.data_type || CASE atc.data_type WHEN 'DATE' THEN '' ELSE '(' "
+            "|| CASE atc.data_type WHEN 'NUMBER' THEN "
+            "TO_CHAR(atc.data_precision) || CASE atc.data_scale WHEN 0 "
+            "THEN '' ELSE ',' || TO_CHAR(atc.data_scale) END "
+            "ELSE TO_CHAR(atc.data_length) END END || CASE atc.data_type "
+            "WHEN 'DATE' THEN '' ELSE ')' END data_type "
+        "FROM all_tab_columns atc "
+        "WHERE atc.table_name = '%s' AND atc.owner = '%s' "
+        "ORDER BY atc.column_id")
+
+    rset = execute_query(cursor, describe % (table.upper(), user.upper()))
+    return rset
+
+
+def run_list_tables(cursor):
+    """Run the a query that shows all the tables and returns a result set"""
+
+    list_all = "SELECT table_name FROM user_tables"
+
+    rset = execute_query(cursor, list_all)
+
+    return rset
+
+
+def get_dbuser(dsn):
+    '''Extracts the user from the dsn string'''
+
+    user = dsn.split('/')[0]
+
+    return user
+
+
 def _main():
     '''Main function'''
 
@@ -116,6 +217,7 @@ def _main():
 
     dsn = sys.argv[1]
     connection = cx_Oracle.Connection(dsn)
+    user = get_dbuser(dsn)
     cursor = connection.cursor()
 
     # Enables tab completion and the history magic
@@ -129,7 +231,7 @@ def _main():
     # register the function to save the history at exit. THX python examples
     atexit.register(readline.write_history_file, histfile)
 
-    io_loop(cursor)
+    io_loop(cursor, user)
 
     cursor.close()
     connection.close()

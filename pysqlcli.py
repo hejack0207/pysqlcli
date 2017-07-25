@@ -17,7 +17,8 @@ def print_usage():
     '''Prints command usage. =( I can't use argparse'''
 
     # I miss argparse
-    print >> sys.stderr, ('Usage: %s <oracle connection string (DSN)>' %
+    print >> sys.stderr, ('''Usage: %s <oracle connection string (DSN)> 
+        like "<user>/<password>@<db_host>:<db_port>/<database>"''' %
     sys.argv[0])
 
 

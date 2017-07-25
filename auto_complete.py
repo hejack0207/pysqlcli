@@ -1,3 +1,6 @@
+import readline
+import os
+
 class DBcompleter(object):
     '''Class for the autocompletion'''
 

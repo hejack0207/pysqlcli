@@ -1,4 +1,6 @@
 import cx_Oracle
+import sys
+import os
 
 class Database(object):
     '''Class to handle the database methods'''

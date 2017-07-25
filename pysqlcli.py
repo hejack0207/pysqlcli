@@ -8,9 +8,10 @@ import readline
 import sys
 import os
 import atexit
-import csv
 
 from db_op import Database
+from auto_complete import DBcompleter
+from process_line import Processor
 
 def print_usage():
     '''Prints command usage. =( I can't use argparse'''

@@ -12,6 +12,7 @@ import atexit
 from db_op import Database
 from auto_complete import DBcompleter
 from process_line import Processor
+import click
 
 def print_usage():
     '''Prints command usage. =( I can't use argparse'''
@@ -38,13 +39,21 @@ def io_loop(processor):
             break
 
 
-def _main():
+@click.command()
+@click.option('--host',help="host name or ip")
+@click.option('--port',default=1521,help="service port number")
+@click.option('--sid',default='orcl',help="sid or service name")
+@click.option('--user',help="user name")
+@click.option('--password',help="password to login")
+def _main(host,port,sid,user,password):
     '''Main function'''
 
-    if len(sys.argv) != 2:
-        print_usage()
-        sys.exit(1)
-    dsn = sys.argv[1]
+    #if len(sys.argv) != 2:
+    #    print_usage()
+    #    sys.exit(1)
+    #dsn = sys.argv[1]
+    dsn = "%s/%s@%s:%s/%s" % (user,password,host,port,sid)
+    print "dsn:"+dsn
     database = Database(dsn)
     # Enables tab completion and the history magic
     readline.parse_and_bind("tab: complete")

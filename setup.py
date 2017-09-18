@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
+#from distutils.core import setup
+from setuptools import setup
 
 install_requires = [
-    'click=6.7',
-    'cx_Oracle=6.0.2',
+    'click==6.7', 'cx_Oracle==6.0.2'
     ]
 
 setup(name='pysqlcli',

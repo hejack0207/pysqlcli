@@ -1,0 +1,2 @@
+gen-requirements:
+	pipreqs . --print

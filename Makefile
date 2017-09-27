@@ -4,4 +4,7 @@ gen-requirements:
 	pipreqs . --print
 
 build:
-	python setup.py build
+	python setup.py clean build
+
+install:
+	sudo python setup.py install

@@ -1,6 +1,7 @@
 import sys
 import os
 import csv
+import click
 
 class Processor(object):
     '''Class for processing the lines'''
@@ -210,19 +211,25 @@ class Printer(object):
         # build and print header
         header = self._build_string(' ', ' | ', '',
         *[field.ljust(max_lengths[idx]) for idx, field in enumerate(headers)])
-        print header
+        output = ''
+        #click.echo_via_pager(header)
+        output += header + '\n'
         # build and print separator
         sep = self._build_string('', '+', '',
             *['-' * (max_lengths[idx] + 2) for idx in xrange(nfields)])
-        print sep
+        #click.echo_via_pager(sep)
+        output += sep + '\n'
         # build and print fields
         for elem in rows:
             row = self._build_string(' ', ' | ', '',
             *[self._normalize(field).ljust(max_lengths[idx]) for idx, field in
             enumerate(elem)])
-            print row
+            #click.echo_via_pager(row)
+            output += row + '\n'
         # num of rows affected
-        print '(%d rows)' % len(rows)
+        #click.echo_via_pager('(%d rows)' % len(rows))
+        output += '(%d rows)' % len(rows) + '\n'
+        click.echo_via_pager(output)
 
 
     def _normalize(self, data):

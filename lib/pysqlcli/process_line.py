@@ -209,7 +209,7 @@ class Printer(object):
     def _print_to_stdout(self, headers, rows):
         '''Prints the result set to stdout'''
 
-        output = io.BytesIO()
+        output = io.StringIO()
         cw = csv.writer(output)
 
         cw.writerow(headers)

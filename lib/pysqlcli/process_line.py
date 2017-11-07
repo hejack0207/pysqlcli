@@ -193,8 +193,8 @@ class Printer(object):
         if self.csv_mode:
             self._print_to_csv(headers, rows)
         else:
-            self._print_to_stdout(max_lengths, headers, rows)
-            #self._print_csv_to_stdout(headers, rows)
+            #self._print_to_stdout(max_lengths, headers, rows)
+            self._print_csv_to_stdout(headers, rows)
 
 
     def _print_to_csv(self, headers, rows):
@@ -209,7 +209,8 @@ class Printer(object):
     def _print_csv_to_stdout(self, headers, rows):
         '''Prints the result set to stdout'''
 
-        output = io.StringIO()
+        output = io.BytesIO()
+        #output = io.StringIO()
         #output.encoding = 'utf-8'
         cw = csv.writer(output)
 
@@ -218,8 +219,8 @@ class Printer(object):
         #writer.writerow('(%d rows)' % len(rows) + '\n')
 
         #click.echo_via_pager(output.getvalue().encode('utf-8').strip('\r\n'))
-        #click.echo_via_pager(output.getvalue().strip('\r\n'))
-        print output.getvalue().strip('\r\n')
+        click.echo_via_pager(output.getvalue().strip('\r\n'))
+        #print output.getvalue().strip('\r\n')
 
     def _print_to_stdout(self, max_lengths, headers, rows):
         '''Prints the result set to stdout'''

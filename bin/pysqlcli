@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 '''
     A substitute of Ora** SQL client that doesn't s*x
     Author: Alejandro E. Brito Monedero
@@ -48,10 +49,9 @@ def io_loop(processor):
 def _main(host,port,sid,user,password):
     '''Main function'''
 
-    #if len(sys.argv) != 2:
-    #    print_usage()
-    #    sys.exit(1)
-    #dsn = sys.argv[1]
+    reload(sys)
+    sys.setdefaultencoding("utf-8")
+
     dsn = "%s/%s@%s:%s/%s" % (user,password,host,port,sid)
     print "dsn:"+dsn
     database = Database(dsn)

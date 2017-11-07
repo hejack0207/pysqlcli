@@ -10,6 +10,8 @@ class Database(object):
 
         self._dsn = dsn
         self._user = self._get_dbuser()
+        #os.environ["NLS_LANG"]="SIMPLIFIED CHINESE_CHINA.UTF8"
+        os.environ["NLS_LANG"]=".UTF8"
         self._connection = cx_Oracle.Connection(self._dsn)
         self._cursor = self._connection.cursor()
 

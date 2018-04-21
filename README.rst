@@ -11,17 +11,17 @@ Examples
 --------
 - Connecting to the database  
 
-Usage: pysqlcli [OPTIONS]
+  Usage: pysqlcli [OPTIONS]
 
   Main function
 
-Options:
-  -h, --host TEXT      host name or ip
-  -P, --port INTEGER   service port number
-  -s, --sid TEXT       sid or service name
-  -u, --user TEXT      user name
-  -p, --password TEXT  password to login
-  --help               Show this message and exit.
+  Options:
+    -h, --host TEXT      host name or ip
+    -P, --port INTEGER   service port number
+    -s, --sid TEXT       sid or service name
+    -u, --user TEXT      user name
+    -p, --password TEXT  password to login
+    --help               Show this message and exit.
         
 - Incommand help
 

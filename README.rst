@@ -4,12 +4,12 @@ pysqlcli
 Python script to use as a sql client for Ora** DBs
 --------------------------------------------------
 
-* It needs the `cx_Oracle` library
-* Right now it is compatible with `python 2.4` (Yes the server running this it a little bit old).
++ It needs the `cx_Oracle` library
++ Right now it is compatible with `python 2.4` (Yes the server running this it a little bit old).
 
 Examples
 --------
-* Connecting to the database ::
++ Connecting to the database ::
 
         Usage: pysqlcli [OPTIONS]
 
@@ -23,7 +23,7 @@ Examples
           -p, --password TEXT  password to login
           --help               Show this message and exit.
         
-* Incommand help ::
++ Incommand help ::
 
         pysqlcli> \h
         \h:            Prints this help
@@ -34,12 +34,12 @@ Examples
         \q:            Exits the program
         <SQL command>: Executes SQL
 
-* Autocomplete using `tab` ::
++ Autocomplete using `tab` ::
 
         pysqlcli> SELECT FROM TA
         TABLE_1        TABLE_2        ...        TABLE_N
 
-* Listing all tables ::
++ Listing all tables ::
 
         pysqlcli> \d
          TABLE_NAME                

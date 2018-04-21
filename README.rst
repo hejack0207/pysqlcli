@@ -1,7 +1,7 @@
 pysqlcli
 ========
 
-Python script to use as a sql client for Ora** DBs
+Python script to use as a sql client for *Ora* DBs
 --------------------------------------------------
 
 + It needs the `cx_Oracle` library

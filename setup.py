@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-#from distutils.core import setup
 from setuptools import setup, find_packages
 
 install_requires = [
@@ -8,14 +7,14 @@ install_requires = [
     ]
 
 setup(name='pysqlcli',
-      version='1.1',
+      version='1.0.0',
       description='Python oracle client',
       author='hejack0207',
       author_email='hejack0207@sina.com',
       url='https://github.com/hejack0207/pysqlcli',
-      #packages=['pysqlcli'],
       package_dir = {'': 'lib'},
       packages=find_packages('lib'),
       install_requires=install_requires,
+      python_requires='>=2.6, <=2.7',
       scripts=['bin/pysqlcli'],
      )

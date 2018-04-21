@@ -54,4 +54,4 @@ Examples
          TABLE_N
         (N rows)
 
-go to top_
+`go to top <pysqlcli_>`_

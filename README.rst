@@ -6,8 +6,8 @@ pysqlcli
 Python script to use as a sql client for **Ora** DBs
 ----------------------------------------------------
 
-+ It needs the `cx_Oracle`_ library
-+ Right now it is compatible with `python 2.4` (Yes the server running this it a little bit old).
+1. It needs the `cx_Oracle`_ library
+#. Right now it is compatible with `python 2.4` (Yes the server running this it a little bit old).
 
 .. _`cx_Oracle`: https://oracle.github.io/python-cx_Oracle/
 

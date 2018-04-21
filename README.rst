@@ -54,4 +54,4 @@ Examples
          TABLE_N
         (N rows)
 
-+ go top_
+go to top_

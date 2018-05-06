@@ -15,15 +15,6 @@ from pysqlcli.auto_complete import DBcompleter
 from pysqlcli.process_line import Processor
 import click
 
-def print_usage():
-    '''Prints command usage. =( I can't use argparse'''
-
-    # I miss argparse
-    print >> sys.stderr, ('''Usage: %s <oracle connection string (DSN)> 
-        like "<user>/<password>@<db_host>:<db_port>/<database>"''' %
-    sys.argv[0])
-
-
 def io_loop(processor):
     '''Prompt reading loop'''
 
